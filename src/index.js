@@ -1,27 +1,20 @@
 import dotenv from "dotenv"
 import connectDB from "./db/index.js";
-import mongoose from "mongoose"
-import { DB_NAME  } from "./constant.js";
-
+import express from "express"
+import {app}from "./app.js"
 
 dotenv.config({
     path:'./env'
 })
-
 
 connectDB()
 .then(()=>{
     app.listen(process.env.PORT || 80000 ,()=>{
         console.log(`App is litening on port ${process.env.PORT}`);
     })
-    app.on("error",(error)=>{
-        console.log("Error",error)
-        throw error
-    }
-    )
 })
 .catch((err)=>{
-    console.log("Error",err)
+    console.log("Error occured 2",err)
     
 })
 
