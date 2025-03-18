@@ -73,5 +73,19 @@ const registerUser = asyncHandler(async (req, res) => {
         new ApiResponse(200, createdUser, "User registered successfully")
     );
 });
+const loginUser=asyncHandler(async(req,res)=>{
+    //req body->data
+    //username or email
+    //find the user
+    //password check
+    //access and refresh token
+    //send cookie
 
-export { registerUser };
+    const {email,username,password}=req.body
+
+    if(!email || !username || !password){
+        return ApiError(400,"All fields are required")
+    }
+})
+
+export { registerUser ,loginUser};
