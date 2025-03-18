@@ -4,13 +4,13 @@ import express from "express"
 import {app}from "./app.js"
 
 dotenv.config({
-    path:'../env'
+    path:'./.env'
 })
 
 connectDB()
 .then(()=>{
     app.listen(process.env.PORT || 80000 ,()=>{
-        console.log(`App is litening on port ${process.env.PORT}`);
+        console.log(`App is litening on port :${process.env.PORT}`);
     })
 })
 .catch((err)=>{
