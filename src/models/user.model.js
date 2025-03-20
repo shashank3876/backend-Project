@@ -60,12 +60,12 @@ userSchema.pre("save", async function (next) {
 
 // ✅ Improved password check
 userSchema.methods.isPasswordCorrect = async function (password) {
-    if (!password) {
-        throw new Error("Entered password is required");
-    }
-    if (!this.password) {
-        throw new Error("User password not found in database");
-    }
+    // if (!password) {
+    //     throw new Error("Entered password is required");
+    // }
+    // if (!this.password) {
+    //     throw new Error("User password not found in database");
+    // }
     return await bcrypt.compare(password, this.password);
 };
 
