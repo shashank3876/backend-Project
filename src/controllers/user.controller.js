@@ -289,7 +289,7 @@ const UpdateUserCoverAvatar=asyncHandler(async(req,res)=>{
     })
     .select("-password ")
 })
-const getUserChannelPrice=asyncHandler(async(req,res)=>{
+const getUserChannelProfile=asyncHandler(async(req,res)=>{
     const {username}=req.params
     if(!username?.trim()){
         throw new ApiError(400,"username is missing")
@@ -357,4 +357,49 @@ const getUserChannelPrice=asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200,channel[0],"Channel details fetched successfully"))
 })
 return res.status(200).json(new ApiResponse(200,{},"Cover image updated successfully"))
-export { registerUser ,loginUser,logoutUser,refreshAccessToken,getCurrentUser,updateAccountDetails,UpdateUserAvatar,changeCurrentPassword,UpdateUserCoverAvatar};              
+
+
+const getWatchHistory=asyncHandler(async(req,res)=>{
+    const user=await User.aggregate([
+        {
+            $match:{
+                _id:new moongose.Types.ObjectId(req.user._id)
+            }
+        },      
+        {
+            $lookup:{
+                from:"videos",
+                localField:"watchHistory",
+                as:"watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:"owner",
+                            foreignField:"_id",
+                            as:"owner",
+                            pipeline:[
+                                {
+                                    $projects:{
+                                        
+                                        fullName:1,
+                                        username:1,
+                                        avatar:1
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project:{
+                _id:0,
+                watchHistory:1
+            }
+        }
+    ])
+    console.log(user)   
+})
+export { registerUser ,loginUser,logoutUser,refreshAccessToken,getCurrentUser,updateAccountDetails,UpdateUserAvatar,changeCurrentPassword,UpdateUserCoverAvatar,getUserChannelProfile,getWatchHistory};              
