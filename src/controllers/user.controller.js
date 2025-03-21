@@ -289,5 +289,72 @@ const UpdateUserCoverAvatar=asyncHandler(async(req,res)=>{
     })
     .select("-password ")
 })
+const getUserChannelPrice=asyncHandler(async(req,res)=>{
+    const {username}=req.params
+    if(!username?.trim()){
+        throw new ApiError(400,"username is missing")
+    }
+    const channel=await aggregate([
+        { 
+            $match:{
+                username:username.toLowerCase()
+        
+            }
+            },
+            {
+                $lookup:{
+                    from:"subscriptions",
+                    localField:"_id",
+                    foreignField:"channel",
+                    as:"subscribers"
+                }
+            },{
+                $lookup:{
+                    from:"subscriptions",
+                    localField:"_id",
+                    foreignField:"subscriber",
+                    as:"subscriberTo"
+                }
+            },{
+                $addFields:{
+                    subscriberscount:{
+                        $size:"$subscribers"
+
+                    },
+                    channelSubscriberToCount:{
+                        $size:"$subscriberTo"
+                    },
+                    isSubsribed:{
+                        $cond:{
+                            if:{$in:[req.user?._id,"subscribers.subscriber"]},
+                            then:true,
+                            else:fasle
+                        }
+                    }
+                }
+            },
+            {
+                $project:{
+                    fullName:1,
+                    username:1,     
+                    subscriberscount:1,
+                    channelSubscriberToCount:1,
+                    isSubcribed:1,
+                    avatar :1,  
+                    coverImage:1,   
+                    email:1,
+                    createdAt:1,
+                    updatedAt:1
+                }
+            }
+        
+    ])
+    console.log(channel)
+    if(!channel?.length){
+        throw new ApiError(404,"Channel not found")
+    }
+    return res.status(200)
+    .json(new ApiResponse(200,channel[0],"Channel details fetched successfully"))
+})
 return res.status(200).json(new ApiResponse(200,{},"Cover image updated successfully"))
 export { registerUser ,loginUser,logoutUser,refreshAccessToken,getCurrentUser,updateAccountDetails,UpdateUserAvatar,changeCurrentPassword,UpdateUserCoverAvatar};              
